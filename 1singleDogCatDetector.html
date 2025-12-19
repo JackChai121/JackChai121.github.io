@@ -1,0 +1,31 @@
+---
+title: 1. Single Dog Cat Detector
+layout: page
+---
+
+<input id="photo" type="file">
+<div id="results"></div>
+<script type="module">
+  import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
+
+  const photo = document.getElementById("photo");
+  const results = document.getElementById("results");
+
+  photo.addEventListener("input", async () => {
+    const file = photo.files[0];
+
+    const client = await Client.connect("JackHug121/CatDogDetector");
+
+    const result = await client.predict("/classify_image", {
+      img: file
+    });
+
+    const confidences = result.data[0].confidences;
+    const top = confidences[0];
+
+    results.innerHTML = `
+      <img src="${URL.createObjectURL(file)}" width="300">
+      <p>${top.label}: ${(top.confidence * 100).toFixed(2)}%</p>
+    `;
+  });
+</script>
